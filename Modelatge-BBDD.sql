@@ -106,6 +106,55 @@ CREATE TABLE IF NOT EXISTS `Vols`.`Usuari` (
 ENGINE = InnoDB;
 
 
+-- -----------------------------------------------------
+-- Table `Vols`.`Autor`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Vols`.`Autor` (
+  `Direcció` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`Direcció`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Vols`.`usuari`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Vols`.`usuari` (
+  `idfactura` INT NOT NULL,
+  `Nom` VARCHAR(45) NULL,
+  `email` VARCHAR(45) NULL,
+  `Cotrasenya` VARCHAR(45) NULL,
+  PRIMARY KEY (`idfactura`),
+  UNIQUE INDEX `idusuari_UNIQUE` (`idfactura` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Vols`.`Llibres`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Vols`.`Llibres` (
+  `idLlibres` VARCHAR(45) NOT NULL,
+  `Venta` INT NULL,
+  `Disponibles` INT NULL,
+  `preu` FLOAT NULL,
+  `Autor_Direcció` VARCHAR(45) NOT NULL,
+  `usuari_idfactura` INT NOT NULL,
+  PRIMARY KEY (`idLlibres`),
+  UNIQUE INDEX `idLlibres_UNIQUE` (`idLlibres` ASC) VISIBLE,
+  INDEX `fk_Llibres_Autor1_idx` (`Autor_Direcció` ASC) VISIBLE,
+  INDEX `fk_Llibres_usuari1_idx` (`usuari_idfactura` ASC) VISIBLE,
+  CONSTRAINT `fk_Llibres_Autor1`
+    FOREIGN KEY (`Autor_Direcció`)
+    REFERENCES `Vols`.`Autor` (`Direcció`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Llibres_usuari1`
+    FOREIGN KEY (`usuari_idfactura`)
+    REFERENCES `Vols`.`usuari` (`idfactura`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
