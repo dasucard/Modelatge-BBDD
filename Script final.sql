@@ -93,14 +93,17 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `Vols`.`Usuari` (
   `idUsuari` INT NOT NULL,
+  `Nom` VARCHAR(45) NULL,
   `Email` VARCHAR(45) NULL,
-  `Contraseña` VARCHAR(45) NULL,
-  `Videos_idVideos` INT NOT NULL,
+  `Contrasenya` VARCHAR(45) NULL,
+  `Procedencia` TINYTEXT NULL,
+  `Fotografies_idCodi` INT NOT NULL,
   PRIMARY KEY (`idUsuari`),
-  INDEX `fk_Usuari_Videos1_idx` (`Videos_idVideos` ASC) VISIBLE,
-  CONSTRAINT `fk_Usuari_Videos1`
-    FOREIGN KEY (`Videos_idVideos`)
-    REFERENCES `Vols`.`Videos` (`idVideos`)
+  INDEX `fk_Usuari_Fotografies1_idx` (`Fotografies_idCodi` ASC) VISIBLE,
+  UNIQUE INDEX `idUsuari_UNIQUE` (`idUsuari` ASC) VISIBLE,
+  CONSTRAINT `fk_Usuari_Fotografies1`
+    FOREIGN KEY (`Fotografies_idCodi`)
+    REFERENCES `Vols`.`Fotografies` (`idCodi`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -150,6 +153,132 @@ CREATE TABLE IF NOT EXISTS `Vols`.`Llibres` (
   CONSTRAINT `fk_Llibres_usuari1`
     FOREIGN KEY (`usuari_idfactura`)
     REFERENCES `Vols`.`usuari` (`idfactura`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Vols`.`Fotografies`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Vols`.`Fotografies` (
+  `idCodi` INT NOT NULL,
+  `URL` VARCHAR(45) NULL,
+  `Lloc` VARCHAR(45) NULL,
+  PRIMARY KEY (`idCodi`),
+  UNIQUE INDEX `idCodi_UNIQUE` (`idCodi` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Vols`.`Usuari`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Vols`.`Usuari` (
+  `idUsuari` INT NOT NULL,
+  `Nom` VARCHAR(45) NULL,
+  `Email` VARCHAR(45) NULL,
+  `Contrasenya` VARCHAR(45) NULL,
+  `Procedencia` TINYTEXT NULL,
+  `Fotografies_idCodi` INT NOT NULL,
+  PRIMARY KEY (`idUsuari`),
+  INDEX `fk_Usuari_Fotografies1_idx` (`Fotografies_idCodi` ASC) VISIBLE,
+  UNIQUE INDEX `idUsuari_UNIQUE` (`idUsuari` ASC) VISIBLE,
+  CONSTRAINT `fk_Usuari_Fotografies1`
+    FOREIGN KEY (`Fotografies_idCodi`)
+    REFERENCES `Vols`.`Fotografies` (`idCodi`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Vols`.`Suplier_has_adress`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Vols`.`Suplier_has_adress` (
+  `idSuplier_has_adress` INT NOT NULL,
+  PRIMARY KEY (`idSuplier_has_adress`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Vols`.`Proveedor`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Vols`.`Proveedor` (
+  `idProveedor` INT NOT NULL,
+  `Telefon` INT NULL,
+  `Fax` VARCHAR(45) NULL,
+  `NIF` INT NULL,
+  `Suplier_has_adress_idSuplier_has_adress` INT NOT NULL,
+  PRIMARY KEY (`idProveedor`, `Suplier_has_adress_idSuplier_has_adress`),
+  INDEX `fk_Proveedor_Suplier_has_adress1_idx` (`Suplier_has_adress_idSuplier_has_adress` ASC) VISIBLE,
+  CONSTRAINT `fk_Proveedor_Suplier_has_adress1`
+    FOREIGN KEY (`Suplier_has_adress_idSuplier_has_adress`)
+    REFERENCES `Vols`.`Suplier_has_adress` (`idSuplier_has_adress`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Vols`.`Clients`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Vols`.`Clients` (
+  `Nom` INT NOT NULL,
+  `Adreça_postal` VARCHAR(45) NULL,
+  `Teléfon` INT NULL,
+  `Correu` VARCHAR(45) NULL,
+  `Data` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`Nom`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Vols`.`Ulleres`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Vols`.`Ulleres` (
+  `Marca` VARCHAR(45) NOT NULL,
+  `Graduació` INT NULL,
+  `Tipus_Montura` SET("flotant", "pasta", "metal-lica") NULL,
+  `Color_Montura` VARCHAR(45) NULL,
+  `Color_Vidre` VARCHAR(45) NULL,
+  `Preu` FLOAT NULL,
+  `Proveedor_idProveedor` INT NOT NULL,
+  `Clients_Nom` INT NOT NULL,
+  PRIMARY KEY (`Marca`, `Clients_Nom`),
+  INDEX `fk_Ulleres_Proveedor1_idx` (`Proveedor_idProveedor` ASC) VISIBLE,
+  INDEX `fk_Ulleres_Clients1_idx` (`Clients_Nom` ASC) VISIBLE,
+  CONSTRAINT `fk_Ulleres_Proveedor1`
+    FOREIGN KEY (`Proveedor_idProveedor`)
+    REFERENCES `Vols`.`Proveedor` (`idProveedor`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Ulleres_Clients1`
+    FOREIGN KEY (`Clients_Nom`)
+    REFERENCES `Vols`.`Clients` (`Nom`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Vols`.`Adreça`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Vols`.`Adreça` (
+  `idAdreça` INT NOT NULL AUTO_INCREMENT,
+  `Carrer` VARCHAR(45) NULL,
+  `Num` INT NULL,
+  `Pis` INT NULL,
+  `Porta` INT NULL,
+  `Ciutat` VARCHAR(45) NULL,
+  `Codipostal` INT NULL,
+  `Pais` VARCHAR(45) NULL,
+  `Suplier_has_adress_idSuplier_has_adress` INT NOT NULL,
+  PRIMARY KEY (`idAdreça`, `Suplier_has_adress_idSuplier_has_adress`),
+  UNIQUE INDEX `idAdreça_UNIQUE` (`idAdreça` ASC) VISIBLE,
+  INDEX `fk_Adreça_Suplier_has_adress1_idx` (`Suplier_has_adress_idSuplier_has_adress` ASC) VISIBLE,
+  CONSTRAINT `fk_Adreça_Suplier_has_adress1`
+    FOREIGN KEY (`Suplier_has_adress_idSuplier_has_adress`)
+    REFERENCES `Vols`.`Suplier_has_adress` (`idSuplier_has_adress`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
